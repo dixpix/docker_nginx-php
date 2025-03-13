@@ -9,9 +9,5 @@ RUN mkdir -p /logs/nginx
 # Exposer le port 80
 EXPOSE 80
 
-# Configurer le healthcheck
-HEALTHCHECK --interval=15s --timeout=10s --retries=3 --start-period=15s \
-    CMD pgrep nginx || exit 1
-
 # Commande par défaut
 CMD ["nginx", "-g", "daemon off;"]

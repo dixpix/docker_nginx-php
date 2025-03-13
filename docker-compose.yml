@@ -2,7 +2,7 @@ services:
   php:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/php/Dockerfile
     restart: unless-stopped
     volumes:
       - "./:/var/www/html"
@@ -16,7 +16,7 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: Dockerfile.nginx
+      dockerfile: docker/nginx/Dockerfile
     restart: unless-stopped
     ports:
       - "80:80"

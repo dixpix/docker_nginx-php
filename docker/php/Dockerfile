@@ -39,9 +39,5 @@ RUN mkdir -p /var/www/html/public && \
 # Exposer le port 9000
 EXPOSE 9000
 
-# Configurer le healthcheck
-HEALTHCHECK --interval=15s --timeout=10s --retries=3 --start-period=15s \
-    CMD pgrep php-fpm || exit 1
-
 # Commande par défaut
 CMD ["php-fpm"]
