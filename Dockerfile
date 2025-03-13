@@ -74,7 +74,7 @@ RUN chmod +x /start.sh
 
 # Configurer le healthcheck
 HEALTHCHECK --interval=15s --timeout=10s --retries=3 --start-period=15s \
-    CMD curl -f http://localhost:80 || exit 1
+    CMD curl -f http://localhost:3000 || exit 1
 
 # Commande par défaut
 CMD ["/start.sh"]
