@@ -40,12 +40,27 @@ if [ ! -d "/var/www/html/public" ]; then
     echo "Création du répertoire public..."
     mkdir -p /var/www/html/public
     echo "<?php echo 'Hello World! PHP fonctionne correctement.';" > /var/www/html/public/index.php
+    chmod 755 /var/www/html/public
+    chmod 644 /var/www/html/public/index.php
+    echo "Fichier index.php créé dans le répertoire public"
 fi
 
 echo "=== Contenu de /var/www/html ==="
 ls -la /var/www/html
 echo "=== Contenu de /var/www/html/public ==="
 ls -la /var/www/html/public
+echo "=== Permissions du répertoire public ==="
+stat -c "%a %n" /var/www/html/public
+echo "=== Permissions du fichier index.php ==="
+if [ -f "/var/www/html/public/index.php" ]; then
+    stat -c "%a %n" /var/www/html/public/index.php
+    echo "=== Contenu du fichier index.php ==="
+    cat /var/www/html/public/index.php
+else
+    echo "Le fichier index.php n'existe pas!"
+fi
+
+# Démarrer PHP-FPM
 exec php-fpm
 EOF
 RUN chmod +x /start.sh

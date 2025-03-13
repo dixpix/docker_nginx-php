@@ -10,6 +10,9 @@ RUN chmod +x /debug.sh
 # Créer le répertoire pour les logs
 RUN mkdir -p /logs/nginx
 
+# Créer le répertoire public
+RUN mkdir -p /var/www/html/public
+
 # Exposer le port 80
 EXPOSE 80
 
