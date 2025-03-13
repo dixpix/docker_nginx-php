@@ -1,14 +1,30 @@
 services:
-  web:
+  php:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
       - "./:/var/www/html"
+    healthcheck:
+      test: ["CMD", "pgrep", "php-fpm"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    restart: unless-stopped
     ports:
       - "80:80"
       - "3000:80"
+    volumes:
+      - "./:/var/www/html"
+    depends_on:
+      - php
     healthcheck:
       test: ["CMD", "pgrep", "nginx"]
       interval: 15s
