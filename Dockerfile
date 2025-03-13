@@ -66,6 +66,17 @@ EXPOSE 80
 # Créer un script de démarrage pour lancer PHP-FPM et Nginx
 COPY <<EOF /start.sh
 #!/bin/sh
+# Configurer PHP-FPM pour écouter sur 127.0.0.1:9000
+mkdir -p /etc/php83/php-fpm.d
+echo "[www]" > /etc/php83/php-fpm.d/www.conf
+echo "listen = 127.0.0.1:9000" >> /etc/php83/php-fpm.d/www.conf
+echo "pm = dynamic" >> /etc/php83/php-fpm.d/www.conf
+echo "pm.max_children = 5" >> /etc/php83/php-fpm.d/www.conf
+echo "pm.start_servers = 2" >> /etc/php83/php-fpm.d/www.conf
+echo "pm.min_spare_servers = 1" >> /etc/php83/php-fpm.d/www.conf
+echo "pm.max_spare_servers = 3" >> /etc/php83/php-fpm.d/www.conf
+
+# Démarrer PHP-FPM et Nginx
 php-fpm83 -D
 nginx -g "daemon off;"
 EOF
