@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# Script pour construire les images Docker PHP et Nginx séquentiellement
+# Script pour construire et démarrer les conteneurs Docker avec docker-compose
 
-echo "Construction de l'image PHP..."
-docker build -t php-app -f Dockerfile .
+echo "Arrêt des conteneurs existants..."
+docker compose down
 
-echo "Construction de l'image Nginx..."
-docker build -t nginx-app -f Dockerfile.nginx .
+echo "Construction des images Docker..."
+docker compose build --no-cache
+
+echo "Démarrage des conteneurs..."
+docker compose up -d
 
 echo "Construction terminée!"
-echo "Vous pouvez maintenant exécuter les conteneurs avec docker-compose up"
+echo "Les conteneurs sont maintenant en cours d'exécution."
+echo "Vous pouvez vérifier leur statut avec: docker compose ps"
+echo "Pour voir les logs: docker compose logs -f"
