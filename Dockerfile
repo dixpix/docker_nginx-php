@@ -66,15 +66,26 @@ EXPOSE 80
 # Créer un script de démarrage pour lancer PHP-FPM et Nginx
 COPY <<EOF /start.sh
 #!/bin/sh
-# Configurer PHP-FPM pour écouter sur 127.0.0.1:9000
+# Configurer PHP-FPM pour utiliser un socket Unix
 mkdir -p /etc/php83/php-fpm.d
 echo "[www]" > /etc/php83/php-fpm.d/www.conf
-echo "listen = 127.0.0.1:9000" >> /etc/php83/php-fpm.d/www.conf
+echo "listen = /var/run/php-fpm.sock" >> /etc/php83/php-fpm.d/www.conf
+echo "listen.owner = nginx" >> /etc/php83/php-fpm.d/www.conf
+echo "listen.group = nginx" >> /etc/php83/php-fpm.d/www.conf
+echo "listen.mode = 0660" >> /etc/php83/php-fpm.d/www.conf
 echo "pm = dynamic" >> /etc/php83/php-fpm.d/www.conf
 echo "pm.max_children = 5" >> /etc/php83/php-fpm.d/www.conf
 echo "pm.start_servers = 2" >> /etc/php83/php-fpm.d/www.conf
 echo "pm.min_spare_servers = 1" >> /etc/php83/php-fpm.d/www.conf
 echo "pm.max_spare_servers = 3" >> /etc/php83/php-fpm.d/www.conf
+
+# Créer un fichier PHP simple pour le healthcheck
+mkdir -p /var/www/html/public
+cat > /var/www/html/public/health.php << 'HEALTHFILE'
+<?php
+header('Content-Type: text/plain');
+echo "OK";
+HEALTHFILE
 
 # Démarrer PHP-FPM et Nginx
 php-fpm83 -D
@@ -85,7 +96,7 @@ RUN chmod +x /start.sh
 
 # Configurer le healthcheck
 HEALTHCHECK --interval=15s --timeout=10s --retries=3 --start-period=15s \
-    CMD curl -f http://localhost:3000 || exit 1
+    CMD curl -f http://localhost:3000/health.php || exit 1
 
 # Commande par défaut
 CMD ["/start.sh"]
