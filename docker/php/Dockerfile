@@ -32,10 +32,6 @@ RUN mkdir -p /logs/php && \
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Créer un fichier index.php simple pour le healthcheck
-RUN mkdir -p /var/www/html/public && \
-    echo '<?php header("Content-Type: text/plain"); echo "OK";' > /var/www/html/public/index.php
-
 # Exposer le port 9000
 EXPOSE 9000
 
