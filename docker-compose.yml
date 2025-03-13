@@ -8,8 +8,9 @@ services:
       - "./:/var/www/html"
     ports:
       - "80:80"
+      - "3000:80"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 15s
       timeout: 10s
       retries: 3
