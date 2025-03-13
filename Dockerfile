@@ -62,11 +62,27 @@ EXPOSE 80
 # Créer un script de démarrage pour lancer PHP-FPM et Nginx
 COPY <<EOF /start.sh
 #!/bin/sh
-# Créer le répertoire pour le socket PHP-FPM
-mkdir -p /run/php
+# Créer les répertoires nécessaires
+mkdir -p /logs/php
 
-# Démarrer PHP-FPM et Nginx
+# Afficher des informations de débogage
+echo "Démarrage des services..."
+
+# Démarrer PHP-FPM
+echo "Démarrage de PHP-FPM..."
 php-fpm83 -D
+echo "PHP-FPM démarré"
+
+# Vérifier que PHP-FPM est en cours d'exécution
+if pgrep php-fpm83; then
+  echo "PHP-FPM est en cours d'exécution"
+else
+  echo "ERREUR: PHP-FPM n'a pas démarré correctement"
+  exit 1
+fi
+
+# Démarrer Nginx
+echo "Démarrage de Nginx..."
 nginx -g "daemon off;"
 EOF
 
