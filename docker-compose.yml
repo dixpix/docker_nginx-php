@@ -9,7 +9,7 @@ services:
     ports:
       - "80:80"
     healthcheck:
-      test: ["CMD", "service", "nginx", "status", "&&", "pgrep", "php-fpm"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 15s
       timeout: 10s
       retries: 3

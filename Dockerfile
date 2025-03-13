@@ -74,7 +74,7 @@ RUN chmod +x /start.sh
 
 # Configurer le healthcheck
 HEALTHCHECK --interval=15s --timeout=10s --retries=3 --start-period=15s \
-    CMD service nginx status && pgrep php-fpm
+    CMD curl -f http://localhost || exit 1
 
 # Commande par défaut
 CMD ["/start.sh"]
