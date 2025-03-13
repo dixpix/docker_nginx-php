@@ -35,6 +35,13 @@ WORKDIR /var/www/html
 # Créer un script de démarrage
 COPY <<EOF /start.sh
 #!/bin/sh
+# Vérifier si le répertoire public existe, sinon le créer
+if [ ! -d "/var/www/html/public" ]; then
+    echo "Création du répertoire public..."
+    mkdir -p /var/www/html/public
+    echo "<?php echo 'Hello World! PHP fonctionne correctement.';" > /var/www/html/public/index.php
+fi
+
 echo "=== Contenu de /var/www/html ==="
 ls -la /var/www/html
 echo "=== Contenu de /var/www/html/public ==="

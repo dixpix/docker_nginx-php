@@ -5,7 +5,7 @@ services:
       dockerfile: docker/php/Dockerfile
     restart: unless-stopped
     volumes:
-      - "./:/var/www/html"
+      - ".:/var/www/html"
     healthcheck:
       test: ["CMD", "pgrep", "php-fpm"]
       interval: 15s
@@ -19,7 +19,7 @@ services:
       dockerfile: docker/nginx/Dockerfile
     restart: unless-stopped
     volumes:
-      - "./:/var/www/html"
+      - ".:/var/www/html"
     depends_on:
       - php
     healthcheck:
