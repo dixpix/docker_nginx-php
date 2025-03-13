@@ -1,15 +1,9 @@
 FROM php:8.3-fpm AS php
 
-# Copier les fichiers de configuration PHP personnalisés
-COPY ./docker/php/logging.ini /custom-config/logging.ini
-
 # Créer le répertoire pour les logs PHP
 RUN mkdir -p /logs/php && \
     touch /logs/php/error.log && \
     chmod 777 /logs/php/error.log
-
-# Définir la variable d'environnement pour le scan des fichiers de configuration PHP
-ENV PHP_INI_SCAN_DIR="/custom-config:/usr/local/etc/php/conf.d"
 
 # Image finale combinant PHP et Nginx
 FROM nginx:1.27.2-alpine-slim
@@ -46,19 +40,21 @@ RUN curl -sS https://getcomposer.org/installer | php83 -- --install-dir=/usr/loc
 # Copier la configuration Nginx
 COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copier les fichiers de configuration PHP personnalisés
-COPY ./docker/php/logging.ini /custom-config/logging.ini
+# Copier les fichiers de configuration PHP
+COPY ./docker/php/php-fpm.conf /etc/php83/php-fpm.conf
+COPY ./docker/php/www.conf /etc/php83/php-fpm.d/www.conf
 
 # Créer le répertoire pour les logs PHP
 RUN mkdir -p /logs/php && \
     touch /logs/php/error.log && \
     chmod 777 /logs/php/error.log
 
-# Définir la variable d'environnement pour le scan des fichiers de configuration PHP
-ENV PHP_INI_SCAN_DIR="/custom-config:/usr/local/etc/php/conf.d"
-
 # Définir le répertoire de travail
 WORKDIR /var/www/html
+
+# Créer un fichier index.php simple pour le healthcheck
+RUN mkdir -p /var/www/html/public && \
+    echo '<?php header("Content-Type: text/plain"); echo "OK";' > /var/www/html/public/index.php
 
 # Exposer le port 80
 EXPOSE 80
@@ -66,26 +62,8 @@ EXPOSE 80
 # Créer un script de démarrage pour lancer PHP-FPM et Nginx
 COPY <<EOF /start.sh
 #!/bin/sh
-# Configurer PHP-FPM pour utiliser un socket Unix
-mkdir -p /etc/php83/php-fpm.d
-echo "[www]" > /etc/php83/php-fpm.d/www.conf
-echo "listen = /var/run/php-fpm.sock" >> /etc/php83/php-fpm.d/www.conf
-echo "listen.owner = nginx" >> /etc/php83/php-fpm.d/www.conf
-echo "listen.group = nginx" >> /etc/php83/php-fpm.d/www.conf
-echo "listen.mode = 0660" >> /etc/php83/php-fpm.d/www.conf
-echo "pm = dynamic" >> /etc/php83/php-fpm.d/www.conf
-echo "pm.max_children = 5" >> /etc/php83/php-fpm.d/www.conf
-echo "pm.start_servers = 2" >> /etc/php83/php-fpm.d/www.conf
-echo "pm.min_spare_servers = 1" >> /etc/php83/php-fpm.d/www.conf
-echo "pm.max_spare_servers = 3" >> /etc/php83/php-fpm.d/www.conf
-
-# Créer un fichier PHP simple pour le healthcheck
-mkdir -p /var/www/html/public
-cat > /var/www/html/public/health.php << 'HEALTHFILE'
-<?php
-header('Content-Type: text/plain');
-echo "OK";
-HEALTHFILE
+# Créer le répertoire pour le socket PHP-FPM
+mkdir -p /run/php
 
 # Démarrer PHP-FPM et Nginx
 php-fpm83 -D
@@ -96,7 +74,7 @@ RUN chmod +x /start.sh
 
 # Configurer le healthcheck
 HEALTHCHECK --interval=15s --timeout=10s --retries=3 --start-period=15s \
-    CMD curl -f http://localhost:3000/health.php || exit 1
+    CMD curl -f http://localhost:3000/ || exit 1
 
 # Commande par défaut
 CMD ["/start.sh"]
