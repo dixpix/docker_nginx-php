@@ -32,8 +32,19 @@ RUN mkdir -p /logs/php && \
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
+# Créer un script de démarrage
+COPY <<EOF /start.sh
+#!/bin/sh
+echo "=== Contenu de /var/www/html ==="
+ls -la /var/www/html
+echo "=== Contenu de /var/www/html/public ==="
+ls -la /var/www/html/public
+exec php-fpm
+EOF
+RUN chmod +x /start.sh
+
 # Exposer le port 9000
 EXPOSE 9000
 
 # Commande par défaut
-CMD ["php-fpm"]
+CMD ["/start.sh"]
