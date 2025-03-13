@@ -35,11 +35,13 @@ RUN apk add --no-cache \
     php83-session \
     php83-simplexml \
     php83-ctype \
+    php83-phar \
     curl \
     unzip
 
 # Installer Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php83 -- --install-dir=/usr/local/bin --filename=composer && \
+    chmod +x /usr/local/bin/composer
 
 # Copier la configuration Nginx
 COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
