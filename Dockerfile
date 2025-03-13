@@ -43,6 +43,7 @@ COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 # Copier les fichiers de configuration PHP
 COPY ./docker/php/php-fpm.conf /etc/php83/php-fpm.conf
 COPY ./docker/php/www.conf /etc/php83/php-fpm.d/www.conf
+COPY ./docker/php/php.ini /etc/php83/conf.d/custom.ini
 
 # Créer le répertoire pour les logs PHP
 RUN mkdir -p /logs/php && \
